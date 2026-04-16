@@ -1,0 +1,6 @@
+com\barbershop\saas\controller\ConsumptionControllerTest.class
+com\barbershop\saas\controller\BarberControllerTest.class
+com\barbershop\saas\SaasApplicationTests.class
+com\barbershop\saas\controller\MemberControllerTest.class
+com\barbershop\saas\controller\HairstyleControllerTest.class
+com\barbershop\saas\controller\MerchantControllerTest.class

@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理发店SaaS管理平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        body {
+            background-color: #f5f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: var(--primary-color);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar .logo {
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar .nav-item {
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar .nav-item:hover,
+        .sidebar .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--secondary-color);
+        }
+        
+        .sidebar .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            padding: 15px 20px;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            opacity: 0.8;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .badge-level {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .level-NORMAL { background: #95a5a6; }
+        .level-SILVER { background: #bdc3c7; color: #333; }
+        .level-GOLD { background: #f1c40f; color: #333; }
+        .level-PLATINUM { background: #3498db; }
+        .level-DIAMOND { background: #9b59b6; }
+        
+        .level-JUNIOR { background: #95a5a6; }
+        .level-INTERMEDIATE { background: #3498db; }
+        .level-SENIOR { background: #27ae60; }
+        .level-MASTER { background: #f39c12; color: #333; }
+        .level-CHIEF { background: #9b59b6; }
+        
+        .status-PENDING { background: #f39c12; color: #333; }
+        .status-APPROVED { background: #27ae60; }
+        .status-REJECTED { background: #e74c3c; }
+        .status-ONLINE { background: #27ae60; }
+        .status-OFFLINE { background: #95a5a6; }
+        
+        .modal-content {
+            border-radius: 10px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .user-info {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-info small {
+            display: block;
+            opacity: 0.7;
+        }
+        
+        .quick-account {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .quick-account p {
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }
+        
+        .quick-account .account-item {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        
+        .quick-account .account-item:hover {
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginPage" class="login-container">
+        <h2><i class="bi bi-scissors"></i> 理发店SaaS平台</h2>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">登录</button>
+        </form>
+        
+        <div class="quick-account">
+            <p><i class="bi bi-info-circle"></i> 测试账号：</p>
+            <div class="account-item" onclick="quickLogin('admin', 'admin123')">
+                <strong>管理员:</strong> admin / admin123
+            </div>
+            <div class="account-item" onclick="quickLogin('shop001', 'shop123')">
+                <strong>商家1:</strong> shop001 / shop123
+            </div>
+            <div class="account-item" onclick="quickLogin('shop002', 'shop123')">
+                <strong>商家2:</strong> shop002 / shop123
+            </div>
+        </div>
+    </div>
+    
+    <div id="mainApp" class="hidden">
+        <div class="sidebar">
+            <div class="logo"><i class="bi bi-scissors"></i> SaaS管理平台</div>
+            <div class="nav-item active" data-page="dashboard">
+                <i class="bi bi-speedometer2"></i> 控制台
+            </div>
+            <div class="nav-item" data-page="merchants" id="navMerchants">
+                <i class="bi bi-shop"></i> 商家管理
+            </div>
+            <div class="nav-item" data-page="members">
+                <i class="bi bi-people"></i> 会员管理
+            </div>
+            <div class="nav-item" data-page="barbers">
+                <i class="bi bi-person-badge"></i> 理发师管理
+            </div>
+            <div class="nav-item" data-page="hairstyles">
+                <i class="bi bi-palette"></i> 发型管理
+            </div>
+            <div class="nav-item" data-page="consumption">
+                <i class="bi bi-receipt"></i> 消费管理
+            </div>
+            <div class="nav-item" data-page="match">
+                <i class="bi bi-diagram-3"></i> 匹配理发师
+            </div>
+            
+            <div class="user-info">
+                <i class="bi bi-person-circle"></i> <span id="currentUsername">用户</span>
+                <small id="currentShop">店铺名称</small>
+                <button class="btn btn-outline-light btn-sm mt-2 w-100" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page-content">
+                <div class="page-header">
+                    <h4><i class="bi bi-speedometer2"></i> 控制台</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <h3 id="statMembers">0</h3>
+                            <p><i class="bi bi-people"></i> 会员总数</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                            <h3 id="statBarbers">0</h3>
+                            <p><i class="bi bi-person-badge"></i> 理发师数量</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f39c12, #f1c40f);">
+                            <h3 id="statHairstyles">0</h3>
+                            <p><i class="bi bi-palette"></i> 发型类型</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <h3 id="statConsumption">¥0</h3>
+                            <p><i class="bi bi-currency-yen"></i> 今日消费</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Merchants Page -->
+            <div id="page-merchants" class="page-content hidden">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h4><i class="bi bi-shop"></i> 商家管理</h4>
+                    <button class="btn btn-primary" onclick="showMerchantRegisterModal()">
+                        <i class="bi bi-plus-lg"></i> 新增商家
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>店铺名称</th>
+                                <th>联系电话</th>
+                                <th>状态</th>
+                                <th>注册时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="merchantsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Members Page -->
+            <div id="page-members" class="page-content hidden">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h4><i class="bi bi-people"></i> 会员管理</h4>
+                    <div>
+                        <button class="btn btn-success" onclick="showRechargeModal()">
+                            <i class="bi bi-wallet2"></i> 会员充值
+                        </button>
+                        <button class="btn btn-primary" onclick="showMemberModal()">
+                            <i class="bi bi-plus-lg"></i> 新增会员
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>手机号</th>
+                                <th>等级</th>
+                                <th>折扣</th>
+                                <th>余额</th>
+                                <th>累计消费</th>
+                                <th>注册时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Barbers Page -->
+            <div id="page-barbers" class="page-content hidden">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h4><i class="bi bi-person-badge"></i> 理发师管理</h4>
+                    <button class="btn btn-primary" onclick="showBarberModal()">
+                        <i class="bi bi-plus-lg"></i> 新增理发师
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>电话</th>
+                                <th>级别</th>
+                                <th>提成比例</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="barbersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Hairstyles Page -->
+            <div id="page-hairstyles" class="page-content hidden">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h4><i class="bi bi-palette"></i> 发型管理</h4>
+                    <div>
+                        <button class="btn btn-success" onclick="showHairstyleOptionModal()">
+                            <i class="bi bi-list-check"></i> 新增发型选项
+                        </button>
+                        <button class="btn btn-primary" onclick="showHairstyleTypeModal()">
+                            <i class="bi bi-plus-lg"></i> 新增发型类型
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">发型类型</div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>名称</th>
+                                            <th>描述</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="hairstyleTypesTable"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">发型选项</div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>名称</th>
+                                            <th>分类</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="hairstyleOptionsTable"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Consumption Page -->
+            <div id="page-consumption" class="page-content hidden">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h4><i class="bi bi-receipt"></i> 消费管理</h4>
+                    <button class="btn btn-primary" onclick="showConsumeModal()">
+                        <i class="bi bi-plus-lg"></i> 创建消费
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>会员</th>
+                                <th>理发师</th>
+                                <th>原价</th>
+                                <th>折扣价</th>
+                                <th>实付</th>
+                                <th>支付方式</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumptionTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Match Page -->
+            <div id="page-match" class="page-content hidden">
+                <div class="page-header">
+                    <h4><i class="bi bi-diagram-3"></i> 匹配理发师</h4>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">选择发型类型</label>
+                                    <select class="form-select" id="matchHairstyleType">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">选择发型选项</label>
+                                    <div id="matchHairstyleOptions"></div>
+                                </div>
+                                <button class="btn btn-primary w-100" onclick="matchBarber()">
+                                    <i class="bi bi-search"></i> 匹配理发师
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>匹配结果</h5>
+                                <div id="matchResults"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Member Modal -->
+    <div class="modal fade" id="memberModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增会员</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="memberForm">
+                        <div class="mb-3">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">手机号</label>
+                            <input type="text" class="form-control" name="phone" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMember()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recharge Modal -->
+    <div class="modal fade" id="rechargeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">会员充值</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rechargeForm">
+                        <div class="mb-3">
+                            <label class="form-label">选择会员</label>
+                            <select class="form-select" name="memberId" required>
+                                <option value="">请选择会员</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">充值金额</label>
+                            <input type="number" class="form-control" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">备注</label>
+                            <input type="text" class="form-control" name="remark">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="doRecharge()">充值</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Barber Modal -->
+    <div class="modal fade" id="barberModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="barberModalTitle">新增理发师</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="barberForm">
+                        <input type="hidden" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">电话</label>
+                            <input type="text" class="form-control" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">级别</label>
+                            <select class="form-select" name="level">
+                                <option value="JUNIOR">初级</option>
+                                <option value="INTERMEDIATE">中级</option>
+                                <option value="SENIOR">高级</option>
+                                <option value="MASTER">大师</option>
+                                <option value="CHIEF">首席</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">提成比例</label>
+                            <input type="number" class="form-control" name="commissionRate" step="0.01" min="0" max="1" value="0.3">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveBarber()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hairstyle Type Modal -->
+    <div class="modal fade" id="hairstyleTypeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增发型类型</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="hairstyleTypeForm">
+                        <div class="mb-3">
+                            <label class="form-label">名称</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">图片URL</label>
+                            <input type="text" class="form-control" name="imageUrl">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveHairstyleType()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hairstyle Option Modal -->
+    <div class="modal fade" id="hairstyleOptionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增发型选项</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="hairstyleOptionForm">
+                        <div class="mb-3">
+                            <label class="form-label">名称</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">分类</label>
+                            <input type="text" class="form-control" name="category" placeholder="如：修剪方式、染发颜色等">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveHairstyleOption()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Consume Modal -->
+    <div class="modal fade" id="consumeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">创建消费</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="consumeForm">
+                        <div class="mb-3">
+                            <label class="form-label">选择会员</label>
+                            <select class="form-select" name="memberId" required onchange="updateMemberInfo()">
+                                <option value="">请选择会员</option>
+                            </select>
+                            <small class="text-muted" id="memberInfo"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">选择理发师</label>
+                            <select class="form-select" name="barberId" required>
+                                <option value="">请选择理发师</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">发型类型</label>
+                            <select class="form-select" name="hairstyleTypeId">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">原价金额</label>
+                            <input type="number" class="form-control" name="originalAmount" step="0.01" min="0.01" required onchange="calculateDiscount()">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">支付方式</label>
+                            <select class="form-select" name="paymentMethod">
+                                <option value="BALANCE">余额支付</option>
+                                <option value="CASH">现金支付</option>
+                                <option value="CARD">刷卡支付</option>
+                                <option value="OTHER">其他</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">备注</label>
+                            <input type="text" class="form-control" name="remark">
+                        </div>
+                        <div class="alert alert-info" id="priceInfo" style="display:none;">
+                            <strong>折扣后金额：</strong><span id="discountAmount">0</span> 元
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="doConsume()">确认消费</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Merchant Register Modal -->
+    <div class="modal fade" id="merchantRegisterModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增商家</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="merchantRegisterForm">
+                        <div class="mb-3">
+                            <label class="form-label">用户名</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">密码</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">店铺名称</label>
+                            <input type="text" class="form-control" name="shopName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">联系电话</label>
+                            <input type="text" class="form-control" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">地址</label>
+                            <input type="text" class="form-control" name="address">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">联系人</label>
+                            <input type="text" class="form-control" name="contactPerson">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="registerMerchant()">提交申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:9090/api';
+        let token = localStorage.getItem('token');
+        let currentUser = null;
+        let members = [];
+        let barbers = [];
+        let hairstyleTypes = [];
+        let hairstyleOptions = [];
+        
+        const levelNames = {
+            'NORMAL': '普通',
+            'SILVER': '银卡',
+            'GOLD': '金卡',
+            'PLATINUM': '白金',
+            'DIAMOND': '钻石'
+        };
+        
+        const barberLevelNames = {
+            'JUNIOR': '初级',
+            'INTERMEDIATE': '中级',
+            'SENIOR': '高级',
+            'MASTER': '大师',
+            'CHIEF': '首席'
+        };
+        
+        const statusNames = {
+            'PENDING': '待审核',
+            'APPROVED': '已通过',
+            'REJECTED': '已拒绝',
+            'ONLINE': '已上线',
+            'OFFLINE': '已下线'
+        };
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast show bg-${type} text-white`;
+            toast.innerHTML = `
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function apiRequest(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            return fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers
+            }).then(response => {
+                if (response.status === 401) {
+                    logout();
+                    throw new Error('登录已过期');
+                }
+                return response.json();
+            });
+        }
+        
+        function quickLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await apiRequest('/merchants/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.code === 200) {
+                    token = response.data.token;
+                    currentUser = response.data.merchant;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showToast('登录成功');
+                    showMainApp();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('登录失败：' + error.message, 'danger');
+            }
+        });
+        
+        function logout() {
+            token = null;
+            currentUser = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+        
+        function showMainApp() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            document.getElementById('currentUsername').textContent = currentUser.username;
+            document.getElementById('currentShop').textContent = currentUser.shopName;
+            
+            if (currentUser.username === 'admin') {
+                document.getElementById('navMerchants').classList.remove('hidden');
+            } else {
+                document.getElementById('navMerchants').classList.add('hidden');
+            }
+            
+            loadDashboard();
+        }
+        
+        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+            item.addEventListener('click', function() {
+                const page = this.dataset.page;
+                showPage(page);
+            });
+        });
+        
+        function showPage(page) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+            
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+            
+            switch(page) {
+                case 'dashboard': loadDashboard(); break;
+                case 'merchants': loadMerchants(); break;
+                case 'members': loadMembers(); break;
+                case 'barbers': loadBarbers(); break;
+                case 'hairstyles': loadHairstyles(); break;
+                case 'consumption': loadConsumption(); break;
+                case 'match': loadMatchData(); break;
+            }
+        }
+        
+        async function loadDashboard() {
+            try {
+                const [membersRes, barbersRes, typesRes] = await Promise.all([
+                    apiRequest('/members?page=0&size=1'),
+                    apiRequest('/barbers?page=0&size=1'),
+                    apiRequest('/hairstyles/types?page=0&size=1')
+                ]);
+                
+                document.getElementById('statMembers').textContent = membersRes.data?.totalElements || 0;
+                document.getElementById('statBarbers').textContent = barbersRes.data?.totalElements || 0;
+                document.getElementById('statHairstyles').textContent = typesRes.data?.totalElements || 0;
+            } catch (error) {
+                console.error('加载仪表盘失败', error);
+            }
+        }
+        
+        async function loadMerchants() {
+            try {
+                const response = await apiRequest('/merchants?page=0&size=100');
+                const tbody = document.getElementById('merchantsTable');
+                tbody.innerHTML = '';
+                
+                response.data.content.forEach(merchant => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${merchant.id}</td>
+                            <td>${merchant.username}</td>
+                            <td>${merchant.shopName}</td>
+                            <td>${merchant.phone || '-'}</td>
+                            <td><span class="badge badge-level status-${merchant.status}">${statusNames[merchant.status]}</span></td>
+                            <td>${new Date(merchant.createdAt).toLocaleString()}</td>
+                            <td>
+                                ${merchant.status === 'PENDING' ? `
+                                    <button class="btn btn-success btn-sm" onclick="approveMerchant(${merchant.id})">通过</button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectMerchant(${merchant.id})">拒绝</button>
+                                ` : ''}
+                                ${merchant.status === 'APPROVED' ? `
+                                    <button class="btn btn-primary btn-sm" onclick="onlineMerchant(${merchant.id})">上线</button>
+                                ` : ''}
+                                ${merchant.status === 'ONLINE' ? `
+                                    <button class="btn btn-warning btn-sm" onclick="offlineMerchant(${merchant.id})">下线</button>
+                                ` : ''}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                showToast('加载商家列表失败', 'danger');
+            }
+        }
+        
+        async function approveMerchant(id) {
+            try {
+                const response = await apiRequest(`/merchants/${id}/approve`, { method: 'POST' });
+                if (response.code === 200) {
+                    showToast('审核通过');
+                    loadMerchants();
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        async function rejectMerchant(id) {
+            try {
+                const response = await apiRequest(`/merchants/${id}/reject`, { method: 'POST' });
+                if (response.code === 200) {
+                    showToast('已拒绝');
+                    loadMerchants();
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        async function onlineMerchant(id) {
+            try {
+                const response = await apiRequest(`/merchants/${id}/online`, { method: 'POST' });
+                if (response.code === 200) {
+                    showToast('已上线');
+                    loadMerchants();
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        async function offlineMerchant(id) {
+            try {
+                const response = await apiRequest(`/merchants/${id}/offline`, { method: 'POST' });
+                if (response.code === 200) {
+                    showToast('已下线');
+                    loadMerchants();
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        function showMerchantRegisterModal() {
+            document.getElementById('merchantRegisterForm').reset();
+            new bootstrap.Modal(document.getElementById('merchantRegisterModal')).show();
+        }
+        
+        async function registerMerchant() {
+            const form = document.getElementById('merchantRegisterForm');
+            const data = Object.fromEntries(new FormData(form));
+            
+            try {
+                const response = await apiRequest('/merchants/register', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast('申请已提交');
+                    bootstrap.Modal.getInstance(document.getElementById('merchantRegisterModal')).hide();
+                    loadMerchants();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('提交失败', 'danger');
+            }
+        }
+        
+        async function loadMembers() {
+            try {
+                const response = await apiRequest('/members?page=0&size=100');
+                members = response.data.content;
+                const tbody = document.getElementById('membersTable');
+                tbody.innerHTML = '';
+                
+                members.forEach(member => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${member.id}</td>
+                            <td>${member.name}</td>
+                            <td>${member.phone}</td>
+                            <td><span class="badge badge-level level-${member.level}">${levelNames[member.level]}</span></td>
+                            <td>${(member.discount * 10).toFixed(1)}折</td>
+                            <td>¥${member.balance.toFixed(2)}</td>
+                            <td>¥${member.totalConsumption.toFixed(2)}</td>
+                            <td>${new Date(member.createdAt).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm" onclick="editMemberLevel(${member.id}, '${member.level}')">改等级</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                updateMemberSelects();
+            } catch (error) {
+                showToast('加载会员列表失败', 'danger');
+            }
+        }
+        
+        function updateMemberSelects() {
+            const selects = document.querySelectorAll('select[name="memberId"]');
+            selects.forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">请选择会员</option>';
+                members.forEach(m => {
+                    select.innerHTML += `<option value="${m.id}">${m.name} (${m.phone}) - 余额: ¥${m.balance.toFixed(2)}</option>`;
+                });
+                select.value = currentValue;
+            });
+        }
+        
+        function showMemberModal() {
+            document.getElementById('memberForm').reset();
+            new bootstrap.Modal(document.getElementById('memberModal')).show();
+        }
+        
+        async function saveMember() {
+            const form = document.getElementById('memberForm');
+            const data = Object.fromEntries(new FormData(form));
+            
+            try {
+                const response = await apiRequest('/members', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast('会员创建成功');
+                    bootstrap.Modal.getInstance(document.getElementById('memberModal')).hide();
+                    loadMembers();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('创建失败', 'danger');
+            }
+        }
+        
+        function showRechargeModal() {
+            document.getElementById('rechargeForm').reset();
+            updateMemberSelects();
+            new bootstrap.Modal(document.getElementById('rechargeModal')).show();
+        }
+        
+        async function doRecharge() {
+            const form = document.getElementById('rechargeForm');
+            const data = Object.fromEntries(new FormData(form));
+            data.amount = parseFloat(data.amount);
+            
+            try {
+                const response = await apiRequest('/members/recharge', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast('充值成功');
+                    bootstrap.Modal.getInstance(document.getElementById('rechargeModal')).hide();
+                    loadMembers();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('充值失败', 'danger');
+            }
+        }
+        
+        async function editMemberLevel(id, currentLevel) {
+            const levels = ['NORMAL', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND'];
+            const newLevel = prompt(`请输入新等级\n可选值: ${levels.join(', ')}\n当前等级: ${currentLevel}`);
+            
+            if (newLevel && levels.includes(newLevel)) {
+                try {
+                    const response = await apiRequest(`/members/${id}/level?level=${newLevel}`, {
+                        method: 'PUT'
+                    });
+                    
+                    if (response.code === 200) {
+                        showToast('等级更新成功');
+                        loadMembers();
+                    }
+                } catch (error) {
+                    showToast('更新失败', 'danger');
+                }
+            }
+        }
+        
+        async function loadBarbers() {
+            try {
+                const response = await apiRequest('/barbers?page=0&size=100');
+                barbers = response.data.content;
+                const tbody = document.getElementById('barbersTable');
+                tbody.innerHTML = '';
+                
+                barbers.forEach(barber => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${barber.id}</td>
+                            <td>${barber.name}</td>
+                            <td>${barber.phone || '-'}</td>
+                            <td><span class="badge badge-level level-${barber.level}">${barberLevelNames[barber.level]}</span></td>
+                            <td>${(barber.commissionRate * 100).toFixed(0)}%</td>
+                            <td>${barber.active ? '<span class="text-success">在职</span>' : '<span class="text-muted">离职</span>'}</td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm" onclick="editBarber(${barber.id})">编辑</button>
+                                <button class="btn btn-outline-${barber.active ? 'warning' : 'success'} btn-sm" onclick="toggleBarberStatus(${barber.id}, ${!barber.active})">
+                                    ${barber.active ? '离职' : '复职'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                updateBarberSelects();
+            } catch (error) {
+                showToast('加载理发师列表失败', 'danger');
+            }
+        }
+        
+        function updateBarberSelects() {
+            const selects = document.querySelectorAll('select[name="barberId"]');
+            selects.forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">请选择理发师</option>';
+                barbers.filter(b => b.active).forEach(b => {
+                    select.innerHTML += `<option value="${b.id}">${b.name} (${barberLevelNames[b.level]})</option>`;
+                });
+                select.value = currentValue;
+            });
+        }
+        
+        function showBarberModal(id = null) {
+            document.getElementById('barberForm').reset();
+            document.getElementById('barberModalTitle').textContent = id ? '编辑理发师' : '新增理发师';
+            
+            if (id) {
+                const barber = barbers.find(b => b.id === id);
+                if (barber) {
+                    const form = document.getElementById('barberForm');
+                    form.querySelector('[name="id"]').value = barber.id;
+                    form.querySelector('[name="name"]').value = barber.name;
+                    form.querySelector('[name="phone"]').value = barber.phone || '';
+                    form.querySelector('[name="level"]').value = barber.level;
+                    form.querySelector('[name="commissionRate"]').value = barber.commissionRate;
+                }
+            }
+            
+            new bootstrap.Modal(document.getElementById('barberModal')).show();
+        }
+        
+        function editBarber(id) {
+            showBarberModal(id);
+        }
+        
+        async function saveBarber() {
+            const form = document.getElementById('barberForm');
+            const data = Object.fromEntries(new FormData(form));
+            data.commissionRate = parseFloat(data.commissionRate);
+            
+            const isEdit = data.id;
+            const url = isEdit ? `/barbers/${data.id}` : '/barbers';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            if (!isEdit) delete data.id;
+            
+            try {
+                const response = await apiRequest(url, {
+                    method,
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast(isEdit ? '更新成功' : '创建成功');
+                    bootstrap.Modal.getInstance(document.getElementById('barberModal')).hide();
+                    loadBarbers();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        async function toggleBarberStatus(id, active) {
+            try {
+                const response = await apiRequest(`/barbers/${id}/status?active=${active}`, {
+                    method: 'PUT'
+                });
+                
+                if (response.code === 200) {
+                    showToast(active ? '已复职' : '已离职');
+                    loadBarbers();
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        async function loadHairstyles() {
+            try {
+                const [typesRes, optionsRes] = await Promise.all([
+                    apiRequest('/hairstyles/types?page=0&size=100'),
+                    apiRequest('/hairstyles/options?page=0&size=100')
+                ]);
+                
+                hairstyleTypes = typesRes.data.content;
+                hairstyleOptions = optionsRes.data.content;
+                
+                const typesTable = document.getElementById('hairstyleTypesTable');
+                typesTable.innerHTML = '';
+                hairstyleTypes.forEach(type => {
+                    typesTable.innerHTML += `
+                        <tr>
+                            <td>${type.name}</td>
+                            <td>${type.description || '-'}</td>
+                            <td>${type.active ? '<span class="text-success">启用</span>' : '<span class="text-muted">禁用</span>'}</td>
+                            <td>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="toggleHairstyleType(${type.id})">切换状态</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteHairstyleType(${type.id})">删除</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                const optionsTable = document.getElementById('hairstyleOptionsTable');
+                optionsTable.innerHTML = '';
+                hairstyleOptions.forEach(option => {
+                    optionsTable.innerHTML += `
+                        <tr>
+                            <td>${option.name}</td>
+                            <td>${option.category || '-'}</td>
+                            <td>${option.active ? '<span class="text-success">启用</span>' : '<span class="text-muted">禁用</span>'}</td>
+                            <td>
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteHairstyleOption(${option.id})">删除</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                updateHairstyleSelects();
+            } catch (error) {
+                showToast('加载发型数据失败', 'danger');
+            }
+        }
+        
+        function updateHairstyleSelects() {
+            const typeSelect = document.querySelector('select[name="hairstyleTypeId"]');
+            if (typeSelect) {
+                typeSelect.innerHTML = '<option value="">请选择</option>';
+                hairstyleTypes.filter(t => t.active).forEach(t => {
+                    typeSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+                });
+            }
+            
+            const matchTypeSelect = document.getElementById('matchHairstyleType');
+            if (matchTypeSelect) {
+                matchTypeSelect.innerHTML = '<option value="">请选择</option>';
+                hairstyleTypes.filter(t => t.active).forEach(t => {
+                    matchTypeSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+                });
+            }
+            
+            const optionsDiv = document.getElementById('matchHairstyleOptions');
+            if (optionsDiv) {
+                optionsDiv.innerHTML = '';
+                const categories = [...new Set(hairstyleOptions.filter(o => o.active).map(o => o.category).filter(c => c))];
+                categories.forEach(cat => {
+                    const opts = hairstyleOptions.filter(o => o.category === cat && o.active);
+                    optionsDiv.innerHTML += `
+                        <div class="mb-2">
+                            <strong>${cat}</strong>
+                            ${opts.map(o => `
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="${o.id}" id="opt_${o.id}">
+                                    <label class="form-check-label" for="opt_${o.id}">${o.name}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        function showHairstyleTypeModal() {
+            document.getElementById('hairstyleTypeForm').reset();
+            new bootstrap.Modal(document.getElementById('hairstyleTypeModal')).show();
+        }
+        
+        async function saveHairstyleType() {
+            const form = document.getElementById('hairstyleTypeForm');
+            const data = Object.fromEntries(new FormData(form));
+            
+            try {
+                const response = await apiRequest('/hairstyles/types', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast('创建成功');
+                    bootstrap.Modal.getInstance(document.getElementById('hairstyleTypeModal')).hide();
+                    loadHairstyles();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('创建失败', 'danger');
+            }
+        }
+        
+        function showHairstyleOptionModal() {
+            document.getElementById('hairstyleOptionForm').reset();
+            new bootstrap.Modal(document.getElementById('hairstyleOptionModal')).show();
+        }
+        
+        async function saveHairstyleOption() {
+            const form = document.getElementById('hairstyleOptionForm');
+            const data = Object.fromEntries(new FormData(form));
+            
+            try {
+                const response = await apiRequest('/hairstyles/options', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast('创建成功');
+                    bootstrap.Modal.getInstance(document.getElementById('hairstyleOptionModal')).hide();
+                    loadHairstyles();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('创建失败', 'danger');
+            }
+        }
+        
+        async function toggleHairstyleType(id) {
+            try {
+                const response = await apiRequest(`/hairstyles/types/${id}/toggle`, { method: 'PUT' });
+                if (response.code === 200) {
+                    showToast('状态已切换');
+                    loadHairstyles();
+                }
+            } catch (error) {
+                showToast('操作失败', 'danger');
+            }
+        }
+        
+        async function deleteHairstyleType(id) {
+            if (confirm('确定删除此发型类型？')) {
+                try {
+                    const response = await apiRequest(`/hairstyles/types/${id}`, { method: 'DELETE' });
+                    if (response.code === 200) {
+                        showToast('删除成功');
+                        loadHairstyles();
+                    }
+                } catch (error) {
+                    showToast('删除失败', 'danger');
+                }
+            }
+        }
+        
+        async function deleteHairstyleOption(id) {
+            if (confirm('确定删除此发型选项？')) {
+                try {
+                    const response = await apiRequest(`/hairstyles/options/${id}`, { method: 'DELETE' });
+                    if (response.code === 200) {
+                        showToast('删除成功');
+                        loadHairstyles();
+                    }
+                } catch (error) {
+                    showToast('删除失败', 'danger');
+                }
+            }
+        }
+        
+        async function loadConsumption() {
+            try {
+                const response = await apiRequest('/consumptions?page=0&size=100');
+                const tbody = document.getElementById('consumptionTable');
+                tbody.innerHTML = '';
+                
+                response.data.content.forEach(record => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${record.id}</td>
+                            <td>${record.memberName || '-'}</td>
+                            <td>${record.barberName || '-'}</td>
+                            <td>¥${record.originalAmount.toFixed(2)}</td>
+                            <td>¥${record.discountAmount.toFixed(2)}</td>
+                            <td>¥${record.actualAmount.toFixed(2)}</td>
+                            <td>${record.paymentMethod}</td>
+                            <td>${new Date(record.createdAt).toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                showToast('加载消费记录失败', 'danger');
+            }
+        }
+        
+        function showConsumeModal() {
+            document.getElementById('consumeForm').reset();
+            document.getElementById('priceInfo').style.display = 'none';
+            updateMemberSelects();
+            updateBarberSelects();
+            updateHairstyleSelects();
+            new bootstrap.Modal(document.getElementById('consumeModal')).show();
+        }
+        
+        function updateMemberInfo() {
+            const select = document.querySelector('select[name="memberId"]');
+            const member = members.find(m => m.id == select.value);
+            const info = document.getElementById('memberInfo');
+            
+            if (member) {
+                info.textContent = `等级: ${levelNames[member.level]} | 折扣: ${(member.discount * 10).toFixed(1)}折 | 余额: ¥${member.balance.toFixed(2)}`;
+                calculateDiscount();
+            } else {
+                info.textContent = '';
+            }
+        }
+        
+        function calculateDiscount() {
+            const select = document.querySelector('select[name="memberId"]');
+            const amountInput = document.querySelector('input[name="originalAmount"]');
+            const member = members.find(m => m.id == select.value);
+            const amount = parseFloat(amountInput.value);
+            
+            if (member && amount > 0) {
+                const discountAmount = amount * member.discount;
+                document.getElementById('discountAmount').textContent = discountAmount.toFixed(2);
+                document.getElementById('priceInfo').style.display = 'block';
+            } else {
+                document.getElementById('priceInfo').style.display = 'none';
+            }
+        }
+        
+        async function doConsume() {
+            const form = document.getElementById('consumeForm');
+            const data = Object.fromEntries(new FormData(form));
+            data.originalAmount = parseFloat(data.originalAmount);
+            data.hairstyleOptionIds = [];
+            
+            try {
+                const response = await apiRequest('/consumptions', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.code === 200) {
+                    showToast('消费记录创建成功');
+                    bootstrap.Modal.getInstance(document.getElementById('consumeModal')).hide();
+                    loadConsumption();
+                    loadMembers();
+                } else {
+                    showToast(response.message, 'danger');
+                }
+            } catch (error) {
+                showToast('创建失败', 'danger');
+            }
+        }
+        
+        async function loadMatchData() {
+            updateHairstyleSelects();
+        }
+        
+        async function matchBarber() {
+            const hairstyleTypeId = document.getElementById('matchHairstyleType').value;
+            const optionIds = [];
+            document.querySelectorAll('#matchHairstyleOptions input:checked').forEach(cb => {
+                optionIds.push(parseInt(cb.value));
+            });
+            
+            try {
+                const response = await apiRequest('/consumptions/match-barber', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        hairstyleTypeId: hairstyleTypeId ? parseInt(hairstyleTypeId) : null,
+                        hairstyleOptionIds: optionIds
+                    })
+                });
+                
+                const resultsDiv = document.getElementById('matchResults');
+                resultsDiv.innerHTML = '';
+                
+                if (response.code === 200 && response.data.length > 0) {
+                    response.data.forEach((barber, index) => {
+                        resultsDiv.innerHTML += `
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">${barber.name}</h6>
+                                            <small class="text-muted">${barber.phone || '无电话'}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge badge-level level-${barber.level}">${barberLevelNames[barber.level]}</span>
+                                            <br>
+                                            <small class="text-muted">提成: ${(barber.commissionRate * 100).toFixed(0)}%</small>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar" style="width: ${barber.matchScore * 20}%"></div>
+                                        </div>
+                                        <small class="text-muted">匹配度: ${barber.matchScore * 20}%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    resultsDiv.innerHTML = '<div class="text-center text-muted">暂无匹配结果</div>';
+                }
+            } catch (error) {
+                showToast('匹配失败', 'danger');
+            }
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedToken = localStorage.getItem('token');
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (savedToken && savedUser) {
+                token = savedToken;
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            }
+        });
+    </script>
+</body>
+</html>
