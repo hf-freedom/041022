@@ -330,6 +330,61 @@ Authorization: Bearer {token}
 
 ---
 
+## 测试说明
+
+### 测试类列表
+1. **MerchantServiceTest.java** - 商家模块测试
+   - 商家注册测试
+   - 商家登录测试
+   - JWT Token生成与验证
+   - 商家审核与上下线测试
+
+2. **MemberServiceTest.java** - 会员模块测试
+   - 添加会员测试
+   - 会员充值测试
+   - 会员消费测试
+   - 会员等级自动升级测试
+   - 手机号绑定测试
+
+3. **BarberServiceTest.java** - 理发师模块测试
+   - 添加/修改理发师测试
+   - 技能匹配理发师测试
+   - 理发师级别与提成比例测试
+
+4. **HairstyleServiceTest.java** - 发型模块测试
+   - 添加/修改发型测试
+   - 发型分类管理测试
+
+5. **OrderServiceTest.java** - 订单模块测试
+   - 散客下单测试
+   - 会员下单（自动折扣）测试
+   - 余额支付测试
+   - 理发师提成自动计算测试
+
+6. **BusinessIntegrationTest.java** - 完整业务流程集成测试（8个步骤）
+   - 步骤1：录入会员
+   - 步骤2：会员充值
+   - 步骤3：添加理发师
+   - 步骤4：添加发型
+   - 步骤5：匹配理发师
+   - 步骤6：创建订单（余额支付）
+   - 步骤7：验证会员等级升级
+   - 步骤8：完整流程验证
+
+### 运行测试
+```bash
+# 运行所有测试
+mvn test
+
+# 运行单个测试类
+mvn test -Dtest="MerchantServiceTest"
+
+# 运行集成测试
+mvn test -Dtest="BusinessIntegrationTest"
+```
+
+---
+
 ## 技术栈
 - SpringBoot 2.7.18
 - Java 8
@@ -337,3 +392,4 @@ Authorization: Bearer {token}
 - MySQL 8.0
 - JWT认证
 - Druid连接池
+- JUnit 5 单元测试
